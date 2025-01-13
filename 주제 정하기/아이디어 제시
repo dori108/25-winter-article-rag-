@@ -1,0 +1,99 @@
+
+ 1. 관련 연구 및 주요 내용
+
+#### **1.1 Splitwise 기반 Prefill 및 Generation 최적화 연구**  
+1. **Splitwiser: Efficient LLM Inference with Constrained Resources**  
+   - 이 연구는 Splitwise 접근법을 사용해 LLM의 Prefill(컨텍스트 설정)과 Generation(생성) 단계를 분리해 리소스 사용을 최적화합니다.  
+   - **핵심 기여**:  
+     - Prefill 단계에서는 고정된 컨텍스트를 캐싱하여 효율성을 극대화.  
+     - Generation 단계에서는 동적인 계산만 수행, 리소스를 분산 처리.
+
+   *출처: [Splitwiser 논문 (PDF)](https://asadaali.com/assets/pdf/paper_splitwiser.pdf)*
+
+2. **Pod-attention: Unlocking Full Prefill-Decode Overlap**  
+   - Prefill과 Decode 단계를 동시에 실행하여, 처리 병목현상을 제거하는 기법.  
+   - **개선점**: Pod-attention 구조를 도입해 Prefill-Decode 사이의 오버헤드를 제거.  
+
+   *출처: [Pod-attention 논문](https://arxiv.org/abs/2410.18038)*
+
+---
+
+#### **1.2 Multi-Modality 입력 상황에서의 KV Cache 최적화**  
+1. **DistServe: Multi-Modality Prefill-Decoding Disaggregation**  
+   - Multi-Modality 데이터를 효율적으로 처리하기 위해, Prefill과 Decoding 단계를 별도로 분리.  
+   - **중요 기여**: 텍스트-이미지 조합 입력에 대해 Cross-Modality Cache Sharing 적용.
+
+   *출처: [DistServe 논문](https://arxiv.org/abs/2411.17651)*
+
+2. **Efficient LLM Scheduling by Learning to Rank**  
+   - Multi-Modality 데이터를 처리하면서, 중요한 데이터를 중심으로 캐싱 전략 최적화.  
+   - **중요 기여**: Multi-Modality 데이터 처리 중 메모리 소모를 줄이는 학습 기반 캐싱 기법 도입.  
+
+   *출처: [LLM Scheduling 논문](https://arxiv.org/abs/2408.15792)*
+
+---
+
+#### **1.3 Speculative Decoding 효율화 연구**  
+1. **Teola: End-to-End Optimization of LLM-Based Applications**  
+   - Speculative Decoding에서 초안(Draft)을 생성하는 경량 모델을 추가.  
+   - **개선점**: Draft 모델을 Knowledge Distillation 방식으로 경량화하고, 검증 모델에서의 Acceptance Ratio를 높임.
+
+   *출처: [Teola 논문](https://arxiv.org/abs/2407.00326)*
+
+2. **AcceLLM: Accelerating LLM Inference with Load Balancing**  
+   - Speculative Decoding에서 초안 생성과 검증 단계를 분리하고, 캐싱 및 병렬화를 도입.  
+   - **핵심 기여**: Prefill과 Decoding 작업을 동적으로 분배.  
+
+   *출처: [AcceLLM 논문](https://arxiv.org/abs/2411.05555)*
+
+---
+
+### 2. 현재 연구의 개선점
+
+1. **Splitwise 접근법의 한계**  
+   - Prefill과 Generation 분리는 병렬처리를 가능하게 하지만, 데이터 간 상호 의존성이 높은 작업에서는 오버헤드가 발생.  
+   - Cache 갱신 비용 증가로 인해 리소스 소모가 커질 수 있음.
+
+2. **Multi-Modality 최적화의 제약**  
+   - KV Cache 최적화는 텍스트 위주로 설계되었으며, 이미지나 오디오 데이터에 적합하지 않을 수 있음.  
+   - Cross-Modality Cache Sharing의 정확도 보장이 어려움.
+
+3. **Speculative Decoding의 개선점**  
+   - Draft 모델이 메인 모델과 성능 차이가 클 경우, Acceptance Ratio가 낮아짐.  
+   - Draft 단계에서 에너지와 리소스를 과도하게 소모하는 문제.
+
+---
+
+### 3. 개선 아이디어
+
+#### **3.1 Splitwise 접근법 개선**  
+1. **컨텍스트 중요도 기반 Prefill 분리**  
+   - Prefill 데이터를 중요도에 따라 "핵심 컨텍스트"와 "보조 컨텍스트"로 분리.  
+   - 핵심 컨텍스트는 캐싱하고, 보조 컨텍스트는 필요 시 동적으로 로드.
+
+2. **인크리멘탈 캐싱(Incremental Caching)**  
+   - Prefill 단계에서 필요한 데이터만 점진적으로 로드하는 기법을 도입.  
+
+#### **3.2 Multi-Modality 최적화 개선**  
+1. **멀티모달 데이터 전처리 최적화**  
+   - 입력 데이터를 텍스트 중심의 벡터로 통합하여 KV Cache의 구조적 단순화.  
+   - 예: 이미지 데이터에서 주요 특징만 추출해 텍스트화.
+
+2. **Cross-Modality Alignment Verification**  
+   - Multi-Modality 데이터를 통합할 때, 다른 데이터 간의 상관성을 검증하는 알고리즘 추가.
+
+#### **3.3 Speculative Decoding 개선**  
+1. **Draft 모델 품질 개선**  
+   - Draft 모델을 메인 모델과 동일한 알고리즘 기반으로 설계하되, 간소화된 학습 데이터셋 사용.  
+   - Knowledge Distillation 적용.  
+
+2. **Acceptance Ratio 증대 알고리즘**  
+   - Draft 결과의 품질을 실시간으로 평가해, 품질이 낮은 초안을 자동으로 필터링.  
+   - Reinforcement Learning 기반 알고리즘 활용.  
+
+---
+
+### 결론  
+이러한 아이디어는 Splitwise, Multi-Modality 최적화, Speculative Decoding에서 발생하는 병목현상과 정확도 문제를 해결하는 데 중점을 둡니다. 특히, 데이터 중요도 기반 캐싱, Cross-Modality 통합 검증, 강화 학습 기반 Acceptance Ratio 증대와 같은 방법들은 LLM 시스템의 성능을 크게 향상시킬 수 있습니다.  
+
+연구 주제로 발전시키기에 충분한 여지가 있으며, 각 제안은 최신 연구와의 차별성을 제공합니다.
