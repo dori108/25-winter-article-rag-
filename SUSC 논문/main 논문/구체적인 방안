@@ -1,0 +1,25 @@
+지피티의 도움으로
+
+1. KV 캐시를 고려한 어텐션 최적화
+기존 어텐션 메커니즘은 모든 입력 토큰에 대해 Query-Key-Value (QKV) 연산을 수행합니다. 하지만 멀티 포맷 캐시 인코딩을 활용하면 KV 저장 방식을 최적화할 수 있습니다.
+제안 방식: KV 캐시에서 텍스트, 이미지, 오디오 데이터를 각각 최적화된 압축 방식으로 저장하고, 이를 활용하는 어텐션 메커니즘을 개발합니다.
+기존의 Sparse Attention 또는 Memory-efficient Attention 기법과 결합하여 더 빠른 연산이 가능할 것입니다.
+
+2. Adaptive Attention Mechanism (적응형 어텐션)
+기존 어텐션 알고리즘은 동일한 방식으로 모든 입력을 처리합니다. 하지만 입력 데이터의 특성에 따라 다르게 연산하는 것이 더 효율적일 수 있습니다.
+제안 방식: 입력 데이터의 모달리티(텍스트, 이미지, 오디오)에 따라 다른 어텐션 연산 방식을 적용하는 Adaptive Attention 모델을 설계합니다.
+예를 들어, 텍스트 입력은 기존의 Self-Attention을 그대로 사용하되, 이미지 입력은 공간적인 정보에 특화된 Cross-Attention을 적용하는 방식입니다.
+
+3. Hierarchical Attention for Multi-Modal Input (멀티모달 입력을 위한 계층적 어텐션)
+기존의 Hierarchical Attention은 문서 분류에서 사용되었지만, 멀티모달 입력을 고려한 적용은 부족합니다.
+제안 방식: 텍스트, 이미지, 오디오 각각의 정보를 개별적으로 처리한 후, 마지막에 계층적 어텐션을 적용하여 멀티모달 상호작용을 최적화하는 방식.
+이 기법은 Show, Attend and Tell 논문의 아이디어를 발전시켜, 멀티모달 입력을 자연스럽게 결합할 수 있도록 합니다.
+
+4. Efficient Attention using Low-rank Approximation (저차원 근사화를 활용한 효율적 어텐션)
+기존의 어텐션 연산은 계산량이 많아, 특히 대용량 데이터를 처리할 때 속도가 느려집니다.
+제안 방식: 저차원 근사화(Low-rank Approximation) 기법을 적용하여 어텐션 연산을 최적화합니다.
+기존의 Linformer, Performer 모델에서 제안된 Low-rank Self-Attention 기법을 개선하여, 멀티모달 환경에서도 성능이 유지될 수 있도록 최적화합니다.
+
+5. Sparse Attention for Multi-Modal Processing (멀티모달 데이터 처리를 위한 희소 어텐션)
+기존 연구들은 Sparse Attention을 NLP에 적용하는 데 집중했지만, 멀티모달 환경에서는 이를 적극적으로 활용할 필요가 있습니다.
+제안 방식: 입력 모달리티에 따라 희소 행렬(Sparse Matrix)로 KV 캐시를 저장하고, 어텐션 연산 시 필요하지 않은 부분은 Masking하여 불필요한 계산을 줄이는 방법.
